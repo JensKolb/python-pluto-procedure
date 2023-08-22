@@ -1,0 +1,41 @@
+procedure
+log "XYX";
+initiate and confirm step Switch_on_Telescopes
+    in the context of Telescope1 do
+        initiate and confirm step Switch_on_HT;
+        wait for 5 s;
+        initiate and confirm Set_HT with arguments Voltage := 2000 V end with;
+    end context;
+    in the context of Telescope2 do
+        initiate and confirm Power_on;
+        wait for 5 s;
+        initiate and confirm Switch_on_HT;
+        wait for 5 s;
+        initiate and confirm Set_HT with arguments Voltage := 2000 V end with;
+    end context;
+end step;
+initiate and confirm step Switch_on_Telescopes
+    in case myVar
+        is =1:
+            log "Will not contine";
+            initiate and confirm Command11 of DummySatellite;
+        or is =2:
+            log "Will not contine";
+        or is ="Jens":
+            initiate and confirm Command12 of DummySatellite;
+        or is ="Jens":
+            initiate and confirm Command12 of DummySatellite;
+        or is ="Jens":
+            initiate and confirm Command12 of DummySatellite;
+        or is ="Jens":
+            initiate and confirm Command12 of DummySatellite;
+        or is ="Jens":
+            initiate and confirm Command12 of DummySatellite;
+        or is ="Jens":
+            initiate and confirm Command12 of DummySatellite;
+        otherwise:
+            initiate and confirm Command42 of DummySatellite;
+    end case;
+end step;
+log "XYX";
+end procedure

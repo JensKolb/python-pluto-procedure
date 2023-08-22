@@ -1,0 +1,7 @@
+procedure
+    main
+        log "XYX";
+        log "ABC";
+    end main
+
+end procedure

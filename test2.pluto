@@ -1,0 +1,129 @@
+
+procedure
+
+    main
+        initiate and confirm step DummyStep
+            preconditions
+                if myVar < 100
+                then wait for 1s
+                then if myVar > 100
+            end preconditions
+            main
+                log "Hello from DummyStep";
+                initiate and confirm Command1 of DummySatellite;
+                /* Test */
+                // Test2
+                log "Now calling nested step";
+                initiate and confirm step NestedStep
+                    declare
+                        event myEvent,
+                        variable myVar of type unsigned integer
+                    end declare
+                    main
+                        log "Hello from NestedStep";
+                        myVar := 123;
+                        log "myVar:", myVar;
+                        wait until  releaseTime of Result of packets_register_ref_ZCD00388 > ref_time_register_TC timeout 600s;
+                        if myVar < 100 then
+                            log "Will contine";
+                            initiate and confirm Command2 of DummySatellite;
+                        else
+                            log "Will not contine";
+                        end if;
+                        
+                    end main
+                    confirmation
+                        if myVar < 100
+                    end confirmation
+                end step
+                in case
+                    confirmed: ask user;
+                    not confirmed: ask user;
+                    aborted: ask user;
+                end case;
+
+                in case myVar
+                    is =123:
+                        log "Will not contine";
+                        initiate and confirm Command11 of DummySatellite;
+                    or is between 124 and 12837561298:
+                        initiate and confirm Command11 of DummySatellite;
+                        initiate and confirm Command12 of DummySatellite;
+                    or is ="Jens":
+                        initiate and confirm step NestedStep
+                            declare
+                                event myEvent,
+                                variable myVar of type unsigned integer
+                            end declare
+                            main
+                                log "Hello from NestedStep";
+                                myVar := 123;
+                                log "myVar:", myVar;
+                                if myVar < 100 then
+                                    log "Will contine";
+                                    initiate and confirm Command2 of DummySatellite;
+                                else
+                                    log "Will not contine";
+                                end if;
+                                
+                            end main
+                            confirmation
+                                if myVar < 100
+                            end confirmation
+                        end step;
+                    otherwise:
+                        initiate and confirm Command42 of DummySatellite;
+                end case;
+
+                initiate and confirm Command3 of DummySatellite;
+
+                if sc_commanding_enabled AND proc_status_general AND stop_dump_tcs_found AND ssmm_checks_ok then	 	
+                    initiate and confirm step request_hk_erport	 
+                        ref_time_register_TC := current_time();
+                            // d) Request HK parameter report
+                        initiate ZCD00388 of TC of SSM
+                            with arguments
+                                raw_value of PCD03881 := 89 // Structure ID (SID)
+                            end with;
+                        log_message := "[RoutineGroundPassConduct] Executing ZCD00288 (Request HK parameter report)";
+                        log log_message;
+                        
+                        initiate and confirm log_to_ueberlog of Helpers of SSM
+                            with arguments
+                                ulog_message_in := log_message, 
+                                ulog_severity_in := "INFO",
+                                ulog_type_in := log_type,
+                                ulog_group_in := log_group
+                            end with;
+                            
+                        // Confirm whether the TC was successfully released from the Ground Station
+                        wait until  releaseTime of Result of packets_register_ref_ZCD00388 > ref_time_register_TC timeout 600s;
+                        if csuplink of stageStatus of Result of packets_register_ref_ZCD00388 = exp_release_status then
+                            wait for 1s;
+                        else
+                                proc_status_general := false;
+                                
+                                log_message := "[RoutineGroundPassConduct] TC release from GS not confirmed/successful. Exiting MATIS procedure.";
+                                log log_message;
+                                initiate and confirm log_to_ueberlog of Helpers of SSM
+                                with arguments
+                                    ulog_message_in := log_message, 
+                                    ulog_severity_in := "MAJOR",
+                                    ulog_type_in := log_type,
+                                    ulog_group_in := log_group
+                                end with;
+                        end if;
+                        
+                        // Do not check for confirmation of the TC execution status
+                        confirmation
+                            if proc_status_general
+                        end confirmation
+                    end step; //request_hk_erport
+                end if;
+            end main
+        end step;
+
+        initiate and confirm Command4 of DummySatellite;
+    end main
+
+end procedure
