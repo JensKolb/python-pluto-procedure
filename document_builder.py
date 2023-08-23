@@ -58,7 +58,6 @@ class PlutoDocument:
             row = len(self.table_data) - 1
             for style in row_styles:
                 self.table_style.append((style[0], (0, row), (-1, row), *style[1:]))
-                print(style, (style[0], (0, row), (-1, row), *style[1:]))
         
 
     def build_step_table(self) -> Table:

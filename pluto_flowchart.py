@@ -146,7 +146,12 @@ class PlutoFlowchart(Interpreter):
 
         tooltip = f'Step {step.number_str}'
 
-        return self.node(node_label, name=step.node_name, html_label=show_number, **{'tooltip': tooltip, **node_attributes})
+        return self.node(
+            label=node_label, 
+            name=step.node_name, 
+            html_label=show_number, 
+            **{'tooltip': tooltip, **node_attributes}
+        )
     
 
     def edges_sequential(self, graph_nodes: List[GraphNode], entry: Union[str, GraphNode]=None, 
@@ -365,6 +370,7 @@ class PlutoFlowchart(Interpreter):
             **ATTR.CASE
         )
         
+        case_graphs = []
         case_exits = []
         for i, case_block in enumerate(case_blocks):
             with self.sub_chart(tree, f'CASE{i}', ATTR.GRAPH.CLEAR) as case_chart:
@@ -373,10 +379,22 @@ class PlutoFlowchart(Interpreter):
                     entry=branch_node, 
                     entry_attr={'label': case_block['case_tag'], 'tailport': '_'}
                 )
+                case_graphs.append(case_chart.g.name)
                 case_exits.append(case_nodes[-1])
 
+        # with self.g.subgraph(name=f'{get_unique_name(tree)}_CASES') as cases_graph:
+        #     cases_graph.attr(rankdir='LR', rank='same')
+        #     for entry, next_entry in zip(case_graphs, case_graphs[1:]):
+        #         cases_graph.edge(entry, next_entry, ltail=self.g.name, lhead=self.g.name, style='invis')
+
         end_node = self.node("", tree_node=tree, name='END', **ATTR.POINT)
-        self.edges_parallel(case_exits, exit=end_node, tailport='s', headport='n', arrowhead='none')
+        self.edges_parallel(
+            graph_nodes=case_exits, 
+            exit=end_node, 
+            tailport='s', 
+            headport='n', 
+            arrowhead='none'
+        )
 
         return GraphNode(branch_node.entry, end_node.exit)
     
@@ -422,7 +440,11 @@ class PlutoFlowchart(Interpreter):
 
         # end if node
         end_node = self.node("", tree_node=tree, name='END', **ATTR.POINT)
-        self.edges_parallel([if_nodes[-1], else_nodes[-1]], exit=end_node, exit_attr={'arrowhead': 'none'})
+        self.edges_parallel(
+            graph_nodes=[if_nodes[-1], else_nodes[-1]], 
+            exit=end_node, 
+            exit_attr={'arrowhead': 'none'}
+        )
 
         return GraphNode(branch_node.entry, end_node.exit)
     

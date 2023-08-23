@@ -14,6 +14,7 @@ procedure
                 /* Test */
                 // Test2
                 log "Now calling nested step";
+                /*
                 initiate and confirm step NestedStep
                     declare
                         event myEvent,
@@ -41,14 +42,12 @@ procedure
                     not confirmed: ask user;
                     aborted: ask user;
                 end case;
+                */
 
-                in case myVar
-                    is =123:
+                in case mode
+                    is ="Test 1":
                         log "Will not contine";
                         initiate and confirm Command11 of DummySatellite;
-                    or is between 124 and 12837561298:
-                        initiate and confirm Command11 of DummySatellite;
-                        initiate and confirm Command12 of DummySatellite;
                     or is ="Jens":
                         initiate and confirm step NestedStep
                             declare
@@ -77,6 +76,7 @@ procedure
 
                 initiate and confirm Command3 of DummySatellite;
 
+                /*
                 if sc_commanding_enabled AND proc_status_general AND stop_dump_tcs_found AND ssmm_checks_ok then	 	
                     initiate and confirm step request_hk_erport	 
                         ref_time_register_TC := current_time();
@@ -120,7 +120,9 @@ procedure
                         end confirmation
                     end step; //request_hk_erport
                 end if;
+                */
             end main
+
         end step;
 
         initiate and confirm Command4 of DummySatellite;

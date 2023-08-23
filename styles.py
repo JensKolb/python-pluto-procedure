@@ -6,6 +6,7 @@ from reportlab.lib.pagesizes import portrait, A4
 
 sample_styles = getSampleStyleSheet()
 
+TRANSPARENT = '#FFFFFF00'
 
 FONT_TABLE = {
     '': 'Courier',
@@ -122,7 +123,7 @@ class ATTR(SimpleNamespace):
                 'fontname': FONT_GRAPH[''],
                 # 'splines': 'ortho',
                 'ranksep': '0.7',
-                # 'nodesep': '2'
+                'nodesep': '0.1',
                 'searchsize': '0'
             },
             'node': {
@@ -138,8 +139,8 @@ class ATTR(SimpleNamespace):
         CLEAR = {
             'graph': {
                 **BASE['graph'],
-                'color': 'transparent',
-                'fillcolor': 'transparent',
+                'color': TRANSPARENT,
+                'fillcolor': TRANSPARENT,
                 'label': '',
             }
         }
@@ -150,7 +151,7 @@ class ATTR(SimpleNamespace):
                 'style': 'filled', 
                 'color': 'grey',
                 'fillcolor': '#00ffff10',
-                'labeljust': 'l'
+                'labeljust': 'l',
             },
         }
 
